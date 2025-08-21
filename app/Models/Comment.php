@@ -77,7 +77,7 @@ class Comment extends Model
     public function userVote(User $user)
     {
         return $this->votes()->where('user_id', $user->id)->value('vote');
-    }git init
+    }
 
     public function scopeApproved($query)
     {
