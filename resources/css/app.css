@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+body { 
+font-family: 'Inter', sans-serif; 
+background-color: #fefefe;
+}
+
+.floating-nav {
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+background: rgba(255, 255, 255, 0.85);
+border-bottom: 1px solid rgba(229, 231, 235, 0.3);
+}
+.gradient-border::before {
+content: '';
+position: absolute;
+inset: 0;
+padding: 1px;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+border-radius: 50px;
+mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+mask-composite: subtract;
+-webkit-mask-composite: xor;
+}
+@media (max-width: 1024px) {
+.mobile-menu {
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+background: rgba(255, 255, 255, 0.95);
+}
+}
+
+/* Serif font class for headings */
+.serif {
+font-family: 'Crimson Text', Georgia, serif;
+}
+
+/* Gradient border utility matching blog style */
+.gradient-border {
+position: relative;
+}
+
+.gradient-border::before {
+content: '';
+position: absolute;
+inset: 0;
+padding: 1px;
+background: linear-gradient(135deg, #e5e7eb, #9ca3af);
+border-radius: inherit;
+mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+mask-composite: xor;
+-webkit-mask-composite: xor;
+}
+
+
+/* Clean scrollbar */
+::-webkit-scrollbar {
+width: 6px;
+}
+
+::-webkit-scrollbar-track {
+background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+background: rgba(156, 163, 175, 0.5);
+border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+background: rgba(156, 163, 175, 0.7);
+}
+
+/* Subtle background pattern */
+body::before {
+content: '';
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-image: 
+radial-gradient(circle at 25px 25px, rgba(156, 163, 175, 0.05) 1px, transparent 0),
+radial-gradient(circle at 75px 75px, rgba(156, 163, 175, 0.05) 1px, transparent 0);
+background-size: 100px 100px;
+background-position: 0 0, 50px 50px;
+pointer-events: none;
+z-index: -1;
+}
+
+/* Remove default focus outlines and add subtle ones */
+*:focus {
+outline: none;
+}
+
+.serif { font-family: serif; }
+.gradient-border {
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(45deg, #e5e7eb, #d1d5db) border-box;
+    border: 1px solid transparent;
+}
+
+/* Smooth transitions for responsive behavior */
+.nav-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom breakpoint animations */
+@media (max-width: 1023px) {
+    .desktop-sidebar {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+@media (min-width: 1024px) {
+    .mobile-nav {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+}
+
+/* Smooth mobile menu transitions */
+.mobile-menu-enter {
+    transform: translateY(-10px);
+    opacity: 0;
+}
+
+.mobile-menu-enter-active {
+    transform: translateY(0);
+    opacity: 1;
+    transition: all 0.3s ease-out;
+}
+
+.mobile-menu-exit {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.mobile-menu-exit-active {
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: all 0.2s ease-in;
+}
+
+/* User dropdown animations */
+.dropdown-enter {
+    transform: translateY(10px) scale(0.95);
+    opacity: 0;
+}
+
+.dropdown-enter-active {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    transition: all 0.2s ease-out;
+}
+
