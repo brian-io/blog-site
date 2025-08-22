@@ -52,7 +52,7 @@
                 <!-- Brand -->
                 <div class="md:text-right">
                     <div class="mb-6">
-                        <h4 class="text-xl font-light text-gray-900 serif tracking-wide mb-2">Blog</h4>
+                        <h4 class="text-xl font-light text-gray-900 serif tracking-wide mb-2">ReadItt</h4>
                         <p class="text-gray-600 text-sm leading-relaxed">
                             Thoughts, stories, and insights on technology, design, and creativity.
                         </p>
