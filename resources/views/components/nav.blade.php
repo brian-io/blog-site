@@ -5,7 +5,7 @@
                 <!-- Logo/Brand -->
                 <div class="flex items-center">
                     <a href="{{ route('blogs.index') }}" class="flex items-center">
-                        <h1 class="text-xl font-light text-gray-900 serif tracking-wide">GT</h1>
+                        <h1 class="text-xl font-light text-gray-900 serif tracking-wide">ReadItt</h1>
                     </a>
                 </div>
 
@@ -63,9 +63,8 @@
                                         <a href="#" 
                                             class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors duration-200">
                                             <!-- User Icon -->
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                    d="M5.135 17.804A9 9 0118.879 6.196M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2"  class="w-5 h-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM6 20c0-3.31 2.69-6 6-6s6 2.69 6 6" />
                                             </svg>
                                             <span class="text-sm">Profile</span>
                                         </a>
@@ -197,9 +196,8 @@
                         <a href="#" 
                            @click="mobileMenuOpen = false"
                            class="flex items-center space-x-3 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                    d="M5.135 17.804A9 9 0118.879 6.196M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2"  class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM6 20c0-3.31 2.69-6 6-6s6 2.69 6 6" />
                             </svg>
                             <span>Profile</span>
                         </a>

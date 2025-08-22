@@ -17,9 +17,8 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('parent_id')->nullable()->constrained('comments')->nullOnDelete();
             $table->text('content');
-            $table->string('author_name')->nullable();
-            $table->string('author_email')->nullable();
-            $table->string('author_website')->nullable();
+            $table->string('user_name')->nullable();
+            $table->string('user_email')->nullable();
             $table->string('ip_address')->nullable();
             $table->text('user_agent')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');

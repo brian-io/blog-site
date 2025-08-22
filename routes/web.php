@@ -8,6 +8,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\VoteController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\IpBlockController;
 use App\Http\Controllers\Admin;
@@ -25,7 +26,7 @@ use App\Http\Controllers\Admin;
 
 // Home route (redirect to blogs)
 Route::get('/', function () {
-    return redirect()->route('blogs.index');
+    return redirect()->route('dashboard');
 });
 
 /*
@@ -47,11 +48,18 @@ Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
 Route::get('/tags/{tag:slug}', [TagController::class, 'show'])->name('tags.show');
 
 // Comments - Public store route (for guest comments)
-Route::post('/blogs/{blog}/comments', [CommentController::class, 'store'])->name('comments.store');
+// Route::post('/blogs/{blog}/comments', [CommentController::class, 'store'])->name('comments.store');
+// Route::delete('/blogs/{blog}/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
 // Newsletter - Public routes
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+
+// Users - Profile routes (accessible to anyone)
+Route::get('/user/{user}', [UserController::class, 'show'])->name('users.show');
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -78,15 +86,19 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/blogs/{blog}', [BlogController::class, 'update'])->name('blogs.update');
     Route::delete('/blogs/{blog}', [BlogController::class, 'destroy'])->name('blogs.destroy');
 
-    // Comments - Authenticated routes
-    // Route::put('/comments/{comment}/approve', [CommentController::class, 'approve'])->name('comments.approve');
-    // Route::put('/comments/{comment}/reject', [CommentController::class, 'reject'])->name('comments.reject');
-    // Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
-    // // Users - Profile routes (accessible to own profile or authorized users)
-    // Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
-    // Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-    // Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    // Comments - Authenticated routes
+    Route::middleware(['rate.limit.comments'])->group(function(){
+        Route::post('/blogs/{blog}/comments', [CommentController::class, 'store'])->name('comments.store');
+        Route::post('/comments/{comment}/vote', [VoteController::class, 'store'])->name('comments.vote');
+        Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+        Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    });
+    
+    // Users - Profile routes (accessible to own profile or authorized users)
+    Route::get('/@/{user}', [UserController::class, 'show'])->name('users.show');
+    Route::get('/@/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/@/{user}', [UserController::class, 'update'])->name('users.update');
 });
 
 /*
@@ -133,6 +145,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         Route::patch('/comments/{comment}/approve', [Admin\CommentController::class, 'approve'])->name('comments.approve');
         Route::patch('/comments/{comment}/reject', [Admin\CommentController::class, 'reject'])->name('comments.reject');
         Route::delete('/comments/{comment}', [Admin\CommentController::class, 'destroy'])->name('comments.destroy');
+        Route::patch('/comments/{comment}/spam', [Admin\CommentController::class, 'markAsSpam'])->name('comments.spam');
+        Route::patch('/comments/{comment}/restore', [Admin\CommentController::class, 'restore'])->name('comments.restore');
+        Route::post('/comments/bulk-action', [Admin\CommentController::class, 'bulkAction'])->name('comments.bulk-action');
+        Route::get('/comments/export', [Admin\CommentController::class, 'export'])->name('comments.export');
     });
 
     // Category Management

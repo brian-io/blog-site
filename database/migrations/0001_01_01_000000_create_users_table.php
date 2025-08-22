@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('website')->nullable();
             $table->string('avatar')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->unsignedInteger('comment_trust_score')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

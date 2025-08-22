@@ -65,8 +65,14 @@ class BlogController extends Controller implements HasMiddleware
             abort(404);
         }
 
-        $blog->load(['author', 'categories', 'tags', 'approvedComments']);
+        $blog->load(['author', 'categories', 'tags']);
         $blog->incrementViewCount();
+
+        $comments = $blog->approvedComments()
+                    ->with(['user', 'replies.user', 'votes'])
+                    ->whereNull('parent_id')
+                    ->withCount(['upvotes', 'downvotes'])
+                    ->get();
 
         // Log page view
         $blog->pageViews()->create([
@@ -80,7 +86,9 @@ class BlogController extends Controller implements HasMiddleware
                 ->exists()
         ]);
 
-        return view('blogs.show', compact('blog'));
+        // dd($comments);
+
+        return view('blogs.show', compact('blog', 'comments'));
 
     }
 
@@ -215,7 +223,8 @@ class BlogController extends Controller implements HasMiddleware
 
         UserActivity::log(
             'blog_deleted',
-            'Deleted blog: ' . $title
+            'Deleted blog: ' . $title,
+            $blog
         );
 
         return redirect()->route('blogs.index')

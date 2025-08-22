@@ -41,6 +41,12 @@ class UserActivity extends Model
     const ACTION_USER_ACTIVATED = 'user_activated';
     const ACTION_USER_DEACTIVATED = 'user_deactivated';
     const ACTION_USER_DELETED = 'user_deleted';
+    const ACTION_COMMENT_DELETED = 'comment_deleted';
+    const ACTION_COMMENT_RESTORED = 'comment_restored';
+    const ACTION_COMMENT_MARKED_SPAM = 'comment_marked_spam';
+    const ACTION_COMMENT_REJECTED = 'comment_rejected';
+
+
 
     public function user()
     {

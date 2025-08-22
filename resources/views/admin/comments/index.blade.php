@@ -15,7 +15,7 @@
     <div class="flex space-x-1 mb-8 bg-gray-100 rounded-lg p-1">
         <a href="{{ route('admin.comments.index', ['status' => 'pending']) }}" 
            class="flex-1 text-center py-2 px-4 rounded-md font-medium text-sm transition-all duration-200 {{ request('status', 'pending') === 'pending' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
-            Pending ({{ $pendingCount }})
+            Pending ({{ $statusCounts['pending'] }})
         </a>
         <a href="{{ route('admin.comments.index', ['status' => 'approved']) }}" 
            class="flex-1 text-center py-2 px-4 rounded-md font-medium text-sm transition-all duration-200 {{ request('status') === 'approved' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">

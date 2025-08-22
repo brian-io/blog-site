@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Torching Grass'),
+    'name' => env('APP_NAME', 'ReadItt'),
 
     /*
     |--------------------------------------------------------------------------

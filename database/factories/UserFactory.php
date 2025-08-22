@@ -37,6 +37,7 @@ class UserFactory extends Factory
             'avatar' => null,
             'is_active' => true,
             'remember_token' => Str::random(10),
+            'comment_trust_score' => random_int(1, 10),
         ];
     }
 

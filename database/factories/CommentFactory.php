@@ -24,9 +24,8 @@ class CommentFactory extends Factory
             'user_id' => rand(0, 1) ? User::factory() : null,
             'parent_id' => null, // You can manually set this in tests/seeds for nesting
             'content' => $this->faker->paragraph(),
-            'author_name' => $this->faker->name(),
-            'author_email' => $this->faker->safeEmail(),
-            'author_website' => $this->faker->url(),
+            'user_name' => $this->faker->name(),
+            'user_email' => $this->faker->safeEmail(),
             'ip_address' => $this->faker->ipv4(),
             'user_agent' => $this->faker->userAgent(),
             'status' => $this->faker->randomElement(['pending', 'approved', 'rejected']),

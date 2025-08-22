@@ -28,7 +28,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'author.only' => \App\Http\Middleware\AuthorOnly::class,
             'blog.exists' => \App\Http\Middleware\BlogExists::class,
             'cache.headers' => \App\Http\Middleware\CacheHeaders::class,
-            'comment.moderation' => \App\Http\Middleware\CommentModeration::class,
             'draft.access' => \App\Http\Middleware\DraftAccess::class,
             'guest.only' => \App\Http\Middleware\GuestOnly::class,
             'mobile.detection' => \App\Http\Middleware\MobileDetection::class,

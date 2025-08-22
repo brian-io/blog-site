@@ -19,7 +19,7 @@ class RateLimitComments
     public function handle(Request $request, Closure $next): Response
     {
         // Only apply rate limiting to comment submissions
-        if(!$request->isMethod('POST') || $request->has('comment')){
+        if(!$request->isMethod('POST') || !$request->has('comment')){
             return $next($request);
         }
 

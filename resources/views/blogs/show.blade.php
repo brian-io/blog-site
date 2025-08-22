@@ -1,6 +1,7 @@
 {{-- resources/views/blogs/show.blade.php --}}
 @extends('layouts.app')
 
+
 @section('content')
 <div class="px-4 sm:px-0">
     <!-- Back Navigation -->
@@ -22,12 +23,7 @@
                 <time datetime="{{ $blog->created_at->toISOString() }}" class="tracking-wide">
                     {{ $blog->created_at->format('M j, Y') }}
                 </time>
-                @if($blog->category)
-                    <a href="{{ route('categories.show', $blog->category->slug) }}" 
-                       class="text-gray-600 hover:text-gray-900 font-medium transition-colors duration-300">
-                        {{ $blog->category->name }}
-                    </a>
-                @endif
+                
             </div>
 
             <!-- Title -->
@@ -56,17 +52,14 @@
                         </div>
                     </div>
                 @endif
-
-                @if($blog->tags->count() > 0)
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($blog->tags as $tag)
-                            <a href="{{ route('tags.show', $tag->slug) }}" 
-                               class="text-xs bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-1 rounded-full transition-colors duration-300">
-                                {{ $tag->name }}
-                            </a>
-                        @endforeach
-                    </div>
+                @if($blog->categories->first())
+                    <a href="{{ route('categories.show', $blog->categories->first()->slug) }}" 
+                       class="text-gray-600 hover:text-gray-900 font-medium transition-colors duration-300">
+                        {{ $blog->categories->first()->name }}
+                    </a>
                 @endif
+
+               
             </div>
         </header>
 
@@ -140,6 +133,17 @@
             {!! $blog->content !!}
         </div>
 
+        @if($blog->tags->count() > 0)
+            <div class="flex flex-wrap gap-2 mb-12">
+                @foreach($blog->tags as $tag)
+                    <a href="{{ route('tags.show', $tag->slug) }}" 
+                        class="text-xs bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-1 rounded-full transition-colors duration-300">
+                        # {{ $tag->name }}
+                    </a>
+                @endforeach
+            </div>
+        @endif
+
         <!-- Article Actions -->
         @auth
             @if(auth()->user()->can('update', $blog) || auth()->user()->can('delete', $blog))
@@ -168,13 +172,17 @@
                 </div>
             @endif
         @endauth
+
+        
     </article>
+
+     
 
     <!-- Comments Section -->
     <div class="max-w-4xl mx-auto mt-16 pt-16 border-t border-gray-200">
         <div class="mb-12">
             <h2 class="text-2xl font-light text-gray-900 serif tracking-wide mb-2">
-                Comments 
+                Comments {{ $comments->count() }}
             </h2>
             <p class="text-gray-600">Share your thoughts on this story</p>
         </div>
@@ -188,22 +196,21 @@
                     <input type="hidden" name="name" value="{{ auth()->user()->name }}">
                     <input type="hidden" name="email" value="{{ auth()->user()->email }}">
                 @endauth
-
                 @guest
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                            <label for="user_name" class="block text-sm font-medium text-gray-700 mb-2">Name</label>
                             <input type="text" 
-                                   id="name"
-                                   name="name" 
+                                   id="user_name"
+                                   name="user_name" 
                                    required 
                                    class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-300">
                         </div>
                         <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <label for="user_email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                             <input type="email" 
-                                   id="email"
-                                   name="email" 
+                                   id="user_email"
+                                   name="user_email" 
                                    required 
                                    class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-300">
                         </div>
@@ -217,65 +224,22 @@
                               rows="5" 
                               required 
                               placeholder="What are your thoughts on this story?"
-                              class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-300 resize-none"></textarea>
+                              class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-300 resize-none">
+                            </textarea>
                 </div>
                 
                 <button type="submit" 
-                        class="bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 hover:shadow-lg hover:shadow-gray-300 transform hover:-translate-y-0.5 transition duration-300 font-medium tracking-wide">
+                        class="bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 hover:shadow-lg hover:shadow-gray-300 transform hover:-translate-y-0.15 transition duration-300 font-medium tracking-wide">
                     Post Comment
                 </button>
             </div>
         </form>
 
         <!-- Comments List -->
-        @if($blog->approvedComments->count() > 0)
+        @if($comments->count() > 0)
             <div class="space-y-8">
-                @foreach($blog->approvedComments as $comment)
-                    <div class="border-l-2 border-gray-200 pl-6 py-2">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-gray-200 rounded-full mr-3 flex items-center justify-center text-sm font-medium text-gray-700">
-                                    {{ substr($comment->getAuthorDisplayName(), 0, 1) }}
-                                </div>
-                                <div>
-                                    <p class="font-medium text-gray-900 tracking-wide">{{ $comment->getAuthorDisplayName() }}</p>
-                                    <time class="text-sm text-gray-500">{{ $comment->created_at->format('M j, Y') }}</time>
-                                </div>
-                            </div>
-                            
-                            @auth
-                                @can('manage-comments')
-                                    <div class="flex items-center space-x-3">
-                                        <form action="{{ route('admin.comments.approve', $comment) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="text-green-600 hover:text-green-800 text-sm transition-colors duration-300">
-                                                Approve
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('admin.comments.reject', $comment) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="text-yellow-600 hover:text-yellow-800 text-sm transition-colors duration-300">
-                                                Reject
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('admin.comments.destroy', $comment) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm transition-colors duration-300">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                @endcan
-                            @endauth
-                        </div>
-                        
-                        <div class="text-gray-700 leading-relaxed">
-                            {{ $comment->content }}
-                        </div>
-                    </div>
+                @foreach($comments as $comment)
+                    @include('partials.comment', ['comment' => $comment, 'depth' => 0])
                 @endforeach
             </div>
         @else
@@ -290,6 +254,5 @@
             </div>
         @endif
     </div>
-    
 </div>
 @endsection

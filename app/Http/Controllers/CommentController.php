@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\Blog;
+use App\Models\Vote;
+
 use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -27,14 +29,32 @@ class CommentController extends Controller implements HasMiddleware
      */
     public function store(Request $request, Blog $blog)
     {
+        $request->merge(['user_id' => Auth::id()]);
+
         $validated = $request->validate([
-        'content' => 'required|string|max:1000',
-        'parent_id' => 'nullable|exists:comments,id',
-        // Match the form field names
-        'name' => 'required_without:user_id|string|max:255',
-        'email' => 'required_without:user_id|email|max:255',
+            'content' => 'required|string|max:1000',
+            'parent_id' => 'nullable|exists:comments,id',
+            'user_name' => 'required_without:user_id|string|max:255',
+            'user_email' => 'required_without:user_id|email|max:255',
         ]);
 
+
+        // Spam detection 
+        if ($this->isSpam($validated['content'])) {
+            return back()->withErrors(['content' => 'Spam Detected!']);
+        }
+
+
+        // Default status
+        $status = Comment::STATUS_PENDING;
+
+        if (Auth::check()){
+            $user = Auth::user();
+
+            if ($user->isAdmin() || ($user->isTrusted())) {
+                $status = Comment::STATUS_APPROVED;
+            }
+        }
         // Map to database columns if different
         $commentData = [
             'content' => $validated['content'],
@@ -42,13 +62,13 @@ class CommentController extends Controller implements HasMiddleware
             'user_id' => Auth::id(),
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'status' => Comment::STATUS_PENDING,
+            'status' => $status,
         ];
        
         // Add guest user data if not authenticated
         if (!Auth::check()) {
-            $commentData['name'] = $validated['name'];
-            $commentData['email'] = $validated['email'];
+            $commentData['user_name'] = $validated['user_name'];
+            $commentData['user_email'] = $validated['user_email'];
         }
 
         // Add parent_id if this is a reply
@@ -66,8 +86,11 @@ class CommentController extends Controller implements HasMiddleware
             );
         }
 
-        return back()->with('success', 'Comment submitted!');
+        return back()->with('success', $status === Comment::STATUS_APPROVED
+        ? 'Comment submitted!'
+        : 'Your comment is waiting moderation');
     }
+
 
     public function approve(Comment $comment)
     {
@@ -97,8 +120,41 @@ class CommentController extends Controller implements HasMiddleware
     {
         Gate::authorize('delete', $comment);
         
-        $comment->delete();
+        if ($comment->replies()->count() > 0) {
+            $comment->delete(); // Soft delete if has replies
+        } else {
+            $comment->forceDelete(); // Permanently delete if no replies
+        }
 
         return back()->with('success', 'Comment deleted!');
     }
+
+    /**
+     * Simple spam detection
+     */
+    private function isSpam($comment)
+    {
+        $spamKeywords = [
+            'buy now', 'click here', 'free money', 'guaranteed', 
+            'make money', 'no obligation', 'risk free', 'viagra',
+            'casino', 'poker', 'lottery', 'winner'
+        ];
+        
+        $comment = strtolower($comment);
+        
+        foreach ($spamKeywords as $keyword) {
+            if (str_contains($comment, $keyword)) {
+                return true;
+            }
+        }
+        
+        // Check for excessive links
+        $linkCount = substr_count($comment, 'http');
+        if ($linkCount > 2) {
+            return true;
+        }
+        
+        return false;
+    }
+
 }

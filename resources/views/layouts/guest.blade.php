@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Gray Times') }}</title>
+    <title>{{ config('app.name', 'ReadItt') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -15,7 +15,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <!-- Additional meta tags -->
-    <meta name="description" content="Sign in to your {{ config('app.name', 'Laravel') }} account">
+    <meta name="description" content="Sign in to your {{ config('app.name', 'ReadItt') }} account">
 </head>
 <body class="font-sans antialiased text-gray-900 bg-white">
     <!-- Subtle background pattern -->
@@ -44,7 +44,7 @@
                 </div>
                 <!-- Brand name -->
                 <h1 class="text-xl font-light text-gray-900 serif tracking-wide">
-                    {{ config('app.name', 'Journal') }}
+                    {{ config('app.name', 'ReadItt') }}
                 </h1>
             </a>
         </div>
@@ -57,7 +57,7 @@
         <!-- Minimal footer -->
         <div class="mt-16 text-center">
             <p class="text-xs text-gray-400 tracking-wide">
-                &copy; {{ date('Y') }} {{ config('app.name', 'Journal') }}
+                &copy; {{ date('Y') }} {{ config('app.name', 'ReadItt') }}
             </p>
         </div>
     </div>

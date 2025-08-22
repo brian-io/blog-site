@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('title', 'Blog Details')
 
@@ -9,11 +9,6 @@
             Blog: {{ $blog->title }}
         </h1>
         <div class="flex space-x-2">
-            {{-- <a href="{{ route('admin.blogs.edit', $blog) }}"
-               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                Edit
-            </a> --}}
-
             @if($blog->status === 'published')
                 <form method="POST" action="{{ route('admin.blogs.unpublish', $blog) }}">
                     @csrf
@@ -74,6 +69,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Comments Section -->
+    @if($blog->comments && $blog->comments->count() > 0)
+        <div class="mt-8 bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">
+                Comments ({{ $blog->comments->count() }})
+            </h2>
+            
+            <div class="space-y-6">
+                @foreach($blog->comments->where('parent_id', null) as $comment)
+                    @include('partials.comment', ['comment' => $comment, 'depth' => 0, 'blog' => $blog])
+                @endforeach
+            </div>
+        </div>
+    @else
+        <div class="mt-8 bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Comments</h2>
+            <p class="text-gray-500">No comments yet.</p>
+        </div>
+    @endif
 
     <div class="mt-6">
         <a href="{{ route('admin.blogs.index') }}"

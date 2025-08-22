@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,19 +16,21 @@ class Comment extends Model
         'blog_id',
         'user_id',
         'parent_id',
-        'author_name',
-        'author_email',
-        'author_website',
         'content',
+        'user_name',
+        'user_email',
         'status',
         'ip_address',
         'user_agent',
-        'spam_score'
+        'spam_score',
     ];
 
     protected $casts = [
         'spam_score' => 'decimal:2',
+        'vote_score' => 'integer',
     ];
+
+    protected $appends =['vote_score'];
 
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
@@ -51,7 +54,18 @@ class Comment extends Model
 
     public function replies()
     {
-        return $this->hasMany(Comment::class, 'parent_id');
+        return $this->hasMany(Comment::class, 'parent_id')
+                    ->where('status', self::STATUS_APPROVED)
+                    ->orderBy('created_at', 'asc');
+    }
+
+    // Add a method to get replies with nested loading when needed
+    public function repliesWithNested()
+    {
+        return $this->replies()
+                    ->with(['replies' => function($query) {
+                        $query->where('status', self::STATUS_APPROVED);
+                    }]);
     }
 
     public function votes()
@@ -64,20 +78,43 @@ class Comment extends Model
         return $this->votes()->where('vote', 1);
     }
 
-     public function downvotes()
+    public function downvotes()
     {
         return $this->votes()->where('vote', -1);
     }
 
-    public function voteScore()
+    public function calculateVoteScore(): int
     {
-        return $this->upvotes()->count() - $this->downvotes()->count();
+        return $this->votes()->sum('vote');
+    }
+    
+    public function getVoteScoreAttribute(): int
+    {
+        if (isset($this->attributes['votes_sum_vote'])){
+            return (int) $this->attributes['votes_sum_vote'];
+        }
+
+        return $this->calculateVoteScore();
     }
 
-    public function userVote(User $user)
+    public function scopeWithVoteScore($query)
     {
-        return $this->votes()->where('user_id', $user->id)->value('vote');
+        return $query->withSum('votes', 'vote');
     }
+
+    public function userVote(?User $user = null): ?int
+{
+        $user ??= Auth::user(); // null coalescing assignment
+        if (!$user) return null;
+
+        // if votes already loaded, filter in memory
+        if ($this->relationLoaded('votes')) {
+            return $this->votes->firstWhere('user_id', $user->id)?->vote;
+        }
+
+        // fallback: query DB
+        return $this->votes()->where('user_id', $user->id)->value('vote');
+}
 
     public function scopeApproved($query)
     {
@@ -109,6 +146,11 @@ class Comment extends Model
         return $this->status === self::STATUS_REJECTED;
     }
     
+    public function isSpam(): bool
+    {
+        return $this->status === self::STATUS_SPAM;
+    }
+    
     public function needsModeration(): bool
     {
         return $this->status === self::STATUS_PENDING;
@@ -116,11 +158,12 @@ class Comment extends Model
 
     public function getAuthorDisplayName(): string
     {
-        return $this->user ? $this->user->name : $this->author_name ?? 'Guest';
+        return $this->user?->name ?? $this->user_name ?? 'Guest';
     }
 
     public function getAuthorInitial(): string
     {
-        return strtoupper(substr($this->getAuthorDisplayName(), 0, 1));
+        $displayName = $this->getAuthorDisplayName();
+        return strtoupper(substr($displayName, 0, 1));
     }
 }
